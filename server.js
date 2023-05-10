@@ -1,81 +1,71 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const { RPS, RPSLS } = require('./lib/a03');
-//import { rpsls } from './lib/a03';
-
-const { createServer } = require('http');
-const { get } = require('./lib/a03');
-
-const port = process.argv[2] || 5555;
-
-const server = createServer((req, res) => {
-  if (req.url === '/favicon.ico') {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end();
-    return;
-  }
-
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end(get());
-});
-
-server.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
+import { rps } from "./lib/rpsls.js";
+import { rpsls } from "./lib/rpsls.js";
+import minimist from "minimist";
+import express from "express";
+import bodyParser from 'body-parser';
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const PORT = process.argv.slice(2)[0] || 5000;
-
-// Default API endpoint
-app.use('/app/', (req, res) => {
-  res.status(404).send('404 NOT FOUND');
+// Default endpoint
+app.get('/app/', (req, res) => {
+  res.status(200).send('Hello, World!');
 });
 
-// /app/ endpoint
-app.use('/app', (req, res) => {
-  res.status(200).send('200 OK');
-});
-
-// /app/rps/ endpoint
-app.use('/app/rps/', (req, res) => {
+// RPS endpoint
+app.get('/app/rps/', (req, res) => {
   res.status(200).send({ player: '(rock|paper|scissors)' });
 });
 
-// /app/rpsls/ endpoint
-app.use('/app/rpsls/', (req, res) => {
+// RPSLS endpoint
+app.get('/app/rpsls/', (req, res) => {
   res.status(200).send({ player: '(rock|paper|scissors|lizard|spock)' });
 });
 
-// /app/rps/play/ endpoint
+// Play RPS endpoint
 app.post('/app/rps/play/', (req, res) => {
-  const { shot } = req.body;
-  const rps = new RPS();
-  const result = rps.play(shot);
-  res.status(200).send(result);
+  const playerShot = req.body.shot;
+  const opponentShot = rps.getComputerShot();
+  const result = rps.getWinner(playerShot, opponentShot);
+  res.status(200).send({
+    player: playerShot,
+    opponent: opponentShot,
+    result: result,
+  });
 });
 
-// /app/rpsls/play/ endpoint
+// Play RPSLS endpoint
 app.post('/app/rpsls/play/', (req, res) => {
-  const { shot } = req.body;
-  const rpsls = new RPSLS();
-  const result = rpsls.play(shot);
-  res.status(200).send(result);
+  const playerShot = req.body.shot;
+  const opponentShot = rpsls.getComputerShot();
+  const result = rpsls.getWinner(playerShot, opponentShot);
+  res.status(200).send({
+    player: playerShot,
+    opponent: opponentShot,
+    result: result,
+  });
 });
 
-// /app/rpsls/play/:shot endpoint
-app.use('/app/rpsls/play/:shot', (req, res) => {
-  const { shot } = req.params;
-  const rpsls = new RPSLS();
-  const result = rpsls.play(shot);
-  res.status(200).send(result);
+// Play RPSLS with opponent shot endpoint
+app.get('/app/rpsls/play/:shot/', (req, res) => {
+  const playerShot = req.params.shot;
+  const opponentShot = rpsls.getComputerShot();
+  const result = rpsls.getWinner(playerShot, opponentShot);
+  res.status(200).send({
+    player: playerShot,
+    opponent: opponentShot,
+    result: result,
+  });
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// 404 endpoint
+app.get('*', (req, res) => {
+  res.status(404).send('Not Found');
+});
+
+const port = process.argv.slice(2)[0] || 5000;
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
 });
 

@@ -1,10 +1,14 @@
-{
+ {
   "name": "rps-api",
   "version": "1.0.0",
   "description": "a03",
   "main": "server.js",
+  "directories":{
+    "lib":"lib"
+  },
   "scripts": {
-    "test": "node server.js --port=5555"
+    "test": "node server.js --port=5555",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -15,11 +19,11 @@
   "bugs": {
     "url": "https://github.com/comp426-2023-spring/a04-indyya/issues"
   },
+  "type": "module",
   "homepage": "https://github.com/comp426-2023-spring/a04-indyya#readme",
-  "devDependencies": {
-    "minimist": "^1.2.8"
-  },
   "dependencies": {
-    "express": "^4.18.2"
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
+    "minimist": "^1.2.8"
   }
 }
